@@ -6,6 +6,7 @@ import mimetypes
 import os
 
 import six
+import json
 
 from tweepy.binder import bind_api
 from tweepy.error import TweepError
@@ -678,6 +679,18 @@ class API(object):
             require_auth=True
         )
 
+    def send_direct_message_new(self, messageobject):
+        """ :reference: https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-event.html
+        """
+        headers, post_data = API._buildmessageobject(messageobject)
+        return bind_api(
+            api=self,
+            path = '/direct_messages/events/new.json',
+            method='POST',
+            require_auth=True
+        )(self, post_data=post_data, headers=headers)
+    
+
     @property
     def favorites(self):
         """ :reference: https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-favorites-list
@@ -1341,6 +1354,18 @@ class API(object):
         # build headers
         headers = {
             'Content-Type': 'multipart/form-data; boundary=Tw3ePy',
+            'Content-Length': str(len(body))
+        }
+
+        return headers, body
+
+    """ Internal use only """
+    @staticmethod
+    def _buildmessageobject(messageobject):
+        body = json.dumps(messageobject)
+        # build headers
+        headers = {
+            'Content-Type': 'application/json',
             'Content-Length': str(len(body))
         }
 

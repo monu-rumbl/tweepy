@@ -87,6 +87,9 @@ def bind_api(**config):
             self._reset_time = None
 
         def build_parameters(self, args, kwargs):
+            if '/direct_messages/events/new.json' in self.path:
+                args = ()
+                kwargs = {}
             self.session.params = {}
             for idx, arg in enumerate(args):
                 if arg is None:
